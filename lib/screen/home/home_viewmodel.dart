@@ -13,6 +13,9 @@ class HomeViewmodel extends Viewmodel {
   
   Stream<QuerySnapshot> todoStream = FirebaseFirestore.instance.collection('Todo').snapshots();
 
+  // only the collection reference
+  CollectionReference todo = FirebaseFirestore.instance.collection('Todo');
+
   addTask(Task task) async{
     final pref = await SharedPreferences.getInstance();
     await getTasks();

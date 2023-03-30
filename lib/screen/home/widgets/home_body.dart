@@ -146,24 +146,44 @@ class _HomeBodyState extends State<HomeBody> {
                 const SizedBox(
                   height: 15,
                 ),
-                SizedBox(
-                  height: 150,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      CategoryTile(
-                        categoryName: "Work",
-                        taskData:
-                            "${widget.viewmodel.taskList.where((element) => element.category == 'work').toList().length} Tasks",
+
+                StreamBuilder<QuerySnapshot>(
+                  stream: widget.viewmodel.todoStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text(
+                          "Something went wrong, Please try again later!");
+                    }
+
+                    if (!snapshot.hasData) {
+                      return const Text("Data does not exsist!");
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    return SizedBox(
+                      height: 150,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          CategoryTile(
+                            categoryName: "Work",
+                            taskData:
+                            "${snapshot.data!.docs.where((element) => element.get('category') == 'work').toList().length} Tasks",
+                          ),
+                          CategoryTile(
+                            categoryName: "Personal",
+                            taskData:
+                            "${snapshot.data!.docs.where((element) => element.get('category') == 'personal').toList().length} Tasks",
+                          ),
+                        ],
                       ),
-                      CategoryTile(
-                        categoryName: "Personal",
-                        taskData:
-                            "${widget.viewmodel.taskList.where((element) => element.category == 'personal').toList().length} Tasks",
-                      ),
-                    ],
-                  ),
-                ),
+                    );
+                  },),
                 const SizedBox(
                   height: 30,
                 ),
@@ -240,7 +260,7 @@ class _HomeBodyState extends State<HomeBody> {
                           );
                         },
                       );
-                    }),
+                    },),
               ],
             ),
           ),
