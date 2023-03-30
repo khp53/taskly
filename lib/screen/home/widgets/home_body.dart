@@ -178,24 +178,24 @@ class _HomeBodyState extends State<HomeBody> {
                 const SizedBox(
                   height: 15,
                 ),
-                FutureBuilder<QuerySnapshot>(
-                  future: widget.viewmodel.todo.get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return const Text("Something went wrong, Please try again later!");
-                    }
+                StreamBuilder<QuerySnapshot>(
+                    stream: widget.viewmodel.todoStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const Text(
+                            "Something went wrong, Please try again later!");
+                      }
 
-                    if (!snapshot.hasData) {
-                      return const Text("Data does not exsist!");
-                    }
+                      if (!snapshot.hasData) {
+                        return const Text("Data does not exsist!");
+                      }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                    if (snapshot.connectionState == ConnectionState.done) {
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -209,23 +209,29 @@ class _HomeBodyState extends State<HomeBody> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: RadioListTile(
-                              activeColor: snapshot.data!.docs[index].get('isCompleted') == true
+                              activeColor: snapshot.data!.docs[index]
+                                          .get('isCompleted') ==
+                                      true
                                   ? theme.colorScheme.tertiary
                                   : theme.colorScheme.primary,
                               value: true,
-                              groupValue: snapshot.data!.docs[index].get('isCompleted') ?? false,
-                              onChanged: (value) {
-
-                              },
+                              groupValue: snapshot.data!.docs[index]
+                                      .get('isCompleted') ??
+                                  false,
+                              onChanged: (value) {},
                               title: Text(
                                 snapshot.data!.docs[index].get('taskName'),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  decoration: snapshot.data!.docs[index].get('isCompleted') == true
+                                  decoration: snapshot.data!.docs[index]
+                                              .get('isCompleted') ==
+                                          true
                                       ? TextDecoration.lineThrough
                                       : TextDecoration.none,
-                                  color: snapshot.data!.docs[index].get('isCompleted') == true
+                                  color: snapshot.data!.docs[index]
+                                              .get('isCompleted') ==
+                                          true
                                       ? theme.colorScheme.tertiary
                                       : theme.colorScheme.onBackground,
                                 ),
@@ -234,13 +240,7 @@ class _HomeBodyState extends State<HomeBody> {
                           );
                         },
                       );
-                    }
-
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                ),
+                    }),
               ],
             ),
           ),
