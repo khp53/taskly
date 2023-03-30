@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taskly_new/screen/auth/auth_view.dart';
 import 'package:taskly_new/screen/auth/auth_viewmodel.dart';
+import 'package:taskly_new/screen/home/home_view.dart';
 
 class Login extends StatefulWidget {
   final AuthViewmodel viewmodel;
@@ -71,7 +72,21 @@ class _LoginState extends State<Login> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  widget.viewmodel
+                      .login(
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
+                  )
+                      .then(
+                        (val) => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeView(),
+                          ),
+                        ),
+                  );
+                },
                 color: theme.colorScheme.secondary,
                 child: Text(
                   "Log in",
@@ -89,7 +104,7 @@ class _LoginState extends State<Login> {
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AuthView(),
+                    builder: (context) => const AuthView(),
                   ),
                 ),
                 child: Text("Sign up from here!"),

@@ -71,7 +71,25 @@ class _SignUpState extends State<SignUp> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  widget.viewmodel
+                      .signUp(
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
+                      )
+                      .then(
+                        (val) => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Sign up success!",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                },
                 color: theme.colorScheme.secondary,
                 child: Text(
                   "Sign Up",
