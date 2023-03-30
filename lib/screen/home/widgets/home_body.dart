@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taskly_new/model/task.dart';
 
@@ -177,47 +178,68 @@ class _HomeBodyState extends State<HomeBody> {
                 const SizedBox(
                   height: 15,
                 ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.viewmodel.taskList.length,
-                  itemBuilder: (context, index) {
-                    Task task = widget.viewmodel.taskList[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 15),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: RadioListTile(
-                        activeColor: task.isCompleted == true
-                            ? theme.colorScheme.tertiary
-                            : theme.colorScheme.primary,
-                        value: true,
-                        groupValue: task.isCompleted ?? false,
-                        onChanged: (value) {
-                          widget.viewmodel.updateTask(Task(
-                            name: task.name,
-                            category: task.category,
-                            isCompleted: true,
-                          ));
+                FutureBuilder<QuerySnapshot>(
+                  future: widget.viewmodel.todo.get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text("Something went wrong, Please try again later!");
+                    }
+
+                    if (!snapshot.hasData) {
+                      return const Text("Data does not exsist!");
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          //Task task = widget.viewmodel.taskList[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: RadioListTile(
+                              activeColor: snapshot.data!.docs[index].get('isCompleted') == true
+                                  ? theme.colorScheme.tertiary
+                                  : theme.colorScheme.primary,
+                              value: true,
+                              groupValue: snapshot.data!.docs[index].get('isCompleted') ?? false,
+                              onChanged: (value) {
+
+                              },
+                              title: Text(
+                                snapshot.data!.docs[index].get('taskName'),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: snapshot.data!.docs[index].get('isCompleted') == true
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  color: snapshot.data!.docs[index].get('isCompleted') == true
+                                      ? theme.colorScheme.tertiary
+                                      : theme.colorScheme.onBackground,
+                                ),
+                              ),
+                            ),
+                          );
                         },
-                        title: Text(
-                          task.name!,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: task.isCompleted == true
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                            color: task.isCompleted == true
-                                ? theme.colorScheme.tertiary
-                                : theme.colorScheme.onBackground,
-                          ),
-                        ),
-                      ),
+                      );
+                    }
+
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
-                  },
+                  }
                 ),
               ],
             ),

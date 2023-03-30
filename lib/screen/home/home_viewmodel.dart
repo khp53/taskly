@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../model/task.dart';
 import '../viewmodel.dart';
 
@@ -10,6 +10,8 @@ class HomeViewmodel extends Viewmodel {
     getTasks();
   }
   List<Task> taskList = [];
+  
+  CollectionReference todo = FirebaseFirestore.instance.collection('Todo');
 
   addTask(Task task) async{
     final pref = await SharedPreferences.getInstance();
