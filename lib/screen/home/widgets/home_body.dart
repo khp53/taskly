@@ -79,14 +79,27 @@ class _HomeBodyState extends State<HomeBody> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       onPressed: () {
-                        widget.viewmodel.addTask(
-                          Task(
-                            name: _taskController.text.trim(),
-                            category:
-                                _categoryController.text.trim().toLowerCase(),
-                            isCompleted: false,
-                          ),
-                        );
+                        // widget.viewmodel.addTask(
+                        //   Task(
+                        //     name: _taskController.text.trim(),
+                        //     category:
+                        //         _categoryController.text.trim().toLowerCase(),
+                        //     isCompleted: false,
+                        //   ),
+                        // );
+                        widget.viewmodel
+                            .addTaskFirebase(
+                              _taskController.text.trim(),
+                              _categoryController.text.trim().toLowerCase(),
+                            )
+                            .then(
+                              (value) =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Adding Successful!"),
+                                ),
+                              ),
+                            );
                         _taskController.clear();
                         _categoryController.clear();
                         Navigator.pop(context);
@@ -146,7 +159,6 @@ class _HomeBodyState extends State<HomeBody> {
                 const SizedBox(
                   height: 15,
                 ),
-
                 StreamBuilder<QuerySnapshot>(
                   stream: widget.viewmodel.todoStream,
                   builder: (context, snapshot) {
@@ -173,17 +185,18 @@ class _HomeBodyState extends State<HomeBody> {
                           CategoryTile(
                             categoryName: "Work",
                             taskData:
-                            "${snapshot.data!.docs.where((element) => element.get('category') == 'work').toList().length} Tasks",
+                                "${snapshot.data!.docs.where((element) => element.get('category') == 'work').toList().length} Tasks",
                           ),
                           CategoryTile(
                             categoryName: "Personal",
                             taskData:
-                            "${snapshot.data!.docs.where((element) => element.get('category') == 'personal').toList().length} Tasks",
+                                "${snapshot.data!.docs.where((element) => element.get('category') == 'personal').toList().length} Tasks",
                           ),
                         ],
                       ),
                     );
-                  },),
+                  },
+                ),
                 const SizedBox(
                   height: 30,
                 ),
@@ -199,68 +212,80 @@ class _HomeBodyState extends State<HomeBody> {
                   height: 15,
                 ),
                 StreamBuilder<QuerySnapshot>(
-                    stream: widget.viewmodel.todoStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return const Text(
-                            "Something went wrong, Please try again later!");
-                      }
+                  stream: widget.viewmodel.todoStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text(
+                          "Something went wrong, Please try again later!");
+                    }
 
-                      if (!snapshot.hasData) {
-                        return const Text("Data does not exsist!");
-                      }
+                    if (!snapshot.hasData) {
+                      return const Text("Data does not exsist!");
+                    }
 
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          //Task task = widget.viewmodel.taskList[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 15),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: RadioListTile(
-                              activeColor: snapshot.data!.docs[index]
-                                          .get('isCompleted') ==
-                                      true
-                                  ? theme.colorScheme.tertiary
-                                  : theme.colorScheme.primary,
-                              value: true,
-                              groupValue: snapshot.data!.docs[index]
-                                      .get('isCompleted') ??
-                                  false,
-                              onChanged: (value) {},
-                              title: Text(
-                                snapshot.data!.docs[index].get('taskName'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: snapshot.data!.docs[index]
-                                              .get('isCompleted') ==
-                                          true
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none,
-                                  color: snapshot.data!.docs[index]
-                                              .get('isCompleted') ==
-                                          true
-                                      ? theme.colorScheme.tertiary
-                                      : theme.colorScheme.onBackground,
-                                ),
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        //Task task = widget.viewmodel.taskList[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 15),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: RadioListTile(
+                            activeColor:
+                                snapshot.data!.docs[index].get('isCompleted') ==
+                                        true
+                                    ? theme.colorScheme.tertiary
+                                    : theme.colorScheme.primary,
+                            value: true,
+                            groupValue:
+                                snapshot.data!.docs[index].get('isCompleted') ??
+                                    false,
+                            onChanged: (value) {
+                              widget.viewmodel.updateFirebase(snapshot.data!.docs[index].id)
+                                  .then(
+                                    (value) =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Adding Successful!"),
+                                      ),
+                                    ),
+                              );
+                              //widget.viewmodel.deleteFirebase(snapshot.data!.docs[index].id);
+                            },
+                            title: Text(
+                              snapshot.data!.docs[index].get('taskName'),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                decoration: snapshot.data!.docs[index]
+                                            .get('isCompleted') ==
+                                        true
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
+                                color: snapshot.data!.docs[index]
+                                            .get('isCompleted') ==
+                                        true
+                                    ? theme.colorScheme.tertiary
+                                    : theme.colorScheme.onBackground,
                               ),
                             ),
-                          );
-                        },
-                      );
-                    },),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ),

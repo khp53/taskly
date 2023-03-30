@@ -16,6 +16,26 @@ class HomeViewmodel extends Viewmodel {
   // only the collection reference
   CollectionReference todo = FirebaseFirestore.instance.collection('Todo');
 
+  addTaskFirebase (String taskName, String category) {
+    return todo.add(
+      {
+        'taskName': taskName,
+        'category': category,
+        'isCompleted': false,
+      }
+    );
+  }
+
+  updateFirebase(String docId) {
+    return todo.doc(docId).update({
+      'isCompleted': true,
+    });
+  }
+
+  deleteFirebase(String docId) {
+    return todo.doc(docId).delete();
+  }
+
   addTask(Task task) async{
     final pref = await SharedPreferences.getInstance();
     await getTasks();
