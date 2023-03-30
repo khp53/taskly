@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "892677359919",
+    "project_id": "taskly-6aaea",
+    "storage_bucket": "taskly-6aaea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892677359919:android:085b1b2a24ecb0c7e079da",
+        "android_client_info": {
+          "package_name": "com.learnio.taskly_new"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "892677359919-3o0uis9tn7194ljnn36nh38ver19cn23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArTm3A5vNv3q8YKvGPwVO5d_GGj9bWbvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "892677359919-3o0uis9tn7194ljnn36nh38ver19cn23.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
