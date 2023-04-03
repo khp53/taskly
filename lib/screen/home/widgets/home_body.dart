@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:taskly_new/model/task.dart';
+import 'package:taskly_new/screen/auth/auth_view.dart';
 
 import '../../../common/category_tile.dart';
 import '../home_viewmodel.dart';
@@ -137,13 +137,34 @@ class _HomeBodyState extends State<HomeBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Let's do\nsomething!",
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Let's do\nsomething!",
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onBackground,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        await widget.viewmodel.signOutFromApp().then(
+                              (val) => Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AuthView(),
+                                  ),
+                                  (route) => false),
+                            );
+                      },
+                      icon: Icon(
+                        Icons.exit_to_app_rounded,
+                        color: theme.colorScheme.onBackground,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 30,
@@ -252,15 +273,16 @@ class _HomeBodyState extends State<HomeBody> {
                                 snapshot.data!.docs[index].get('isCompleted') ??
                                     false,
                             onChanged: (value) {
-                              widget.viewmodel.updateFirebase(snapshot.data!.docs[index].id)
+                              widget.viewmodel
+                                  .updateFirebase(snapshot.data!.docs[index].id)
                                   .then(
-                                    (value) =>
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    (value) => ScaffoldMessenger.of(context)
+                                        .showSnackBar(
                                       const SnackBar(
                                         content: Text("Adding Successful!"),
                                       ),
                                     ),
-                              );
+                                  );
                               //widget.viewmodel.deleteFirebase(snapshot.data!.docs[index].id);
                             },
                             title: Text(
